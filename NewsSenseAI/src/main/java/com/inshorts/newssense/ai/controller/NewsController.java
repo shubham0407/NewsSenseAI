@@ -6,11 +6,13 @@ import com.inshorts.newssense.ai.service.DataLoader;
 import com.inshorts.newssense.ai.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -76,6 +78,11 @@ public class NewsController {
             @RequestParam double lon,
             @RequestParam(defaultValue = "5") int limit) {
         return ResponseEntity.ok(newsService.getTrendingNews(lat, lon, limit));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NewsArticle> getNewsArticleById(@PathVariable UUID id){
+        return ResponseEntity.ok(newsService.getById(id));
     }
 
     @PostMapping("/load/news")

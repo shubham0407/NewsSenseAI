@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,20 @@ public class NewsService {
     public Page<NewsArticle> getBySearch(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return newsRepository.searchByTitleOrDescription(query, pageable);
+    }
+
+
+//    public NewsArticle getById(UUID id) {
+//        Optional<NewsArticle> newsArticle= Optional.ofNullable(newsRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("NewsArticle not found with id " + id)));
+//        return newsArticle.get();
+//    }
+
+    public NewsArticle getById(UUID id) {
+        Optional<NewsArticle> newsArticle= newsRepository.findById(id);//.orElseThrow(() -> new EntityNotFoundException("NewsArticle not found with id " + id)));
+        if(!newsArticle.isPresent()){
+            throw  new EntityNotFoundException("NewsArticle not found with id " + id);
+        }
+        return newsArticle.get();
     }
 
 
