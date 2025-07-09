@@ -5,8 +5,9 @@ import com.inshorts.newssense.ai.model.NewsArticle;
 import com.inshorts.newssense.ai.service.DataLoader;
 import com.inshorts.newssense.ai.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/news")
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class NewsController {
 
     private final NewsService newsService;

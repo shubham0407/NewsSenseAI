@@ -8,67 +8,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class DataLoader {
-
-    private static final int BATCH_SIZE = 20; // adjust as needed
-    private static final long BATCH_DELAY_MS = 10_000L; // 10-second delay between batches
-
-    private final ExecutorService executor = Executors.newFixedThreadPool(4);
-
+    private static final long DELAY_MS = 1000;
     @Autowired
     private NewsRepository newsRepository;
-
     @Autowired
     private LLMService llmService;
 
     public void loadData(List<NewsArticleDto> dtos) {
-        log.info("Loading data... ");
-        // Split into batches
-        List<List<NewsArticleDto>> batches = new ArrayList<>();
-        for (int i = 0; i < dtos.size(); i += BATCH_SIZE) {
-            batches.add(dtos.subList(i, Math.min(i + BATCH_SIZE, dtos.size())));
-        }
+        log.info("Starting sequential loading of {} articles...", dtos.size());
 
-        for (List<NewsArticleDto> batch : batches) {
-            // Create Callable tasks for the batch
-            List<Callable<Void>> tasks = new ArrayList<>();
-            for (final NewsArticleDto dto : batch) {
-                tasks.add(new Callable<Void>() {
-                    @Override
-                    public Void call() {
-                        processAndSave(dto);
-                        return null;
-                    }
-                });
-            }
-
-            // Execute the batch
+        int limit = Math.min(100, dtos.size());
+        for (int i = 0; i < limit; i++) {
+            NewsArticleDto dto = dtos.get(i);
+            processAndSave(dto);
             try {
-                executor.invokeAll(tasks);
+                Thread.sleep(DELAY_MS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("Batch interrupted", e);
-            }
-
-            // Optional pause between batches
-            try {
-                Thread.sleep(BATCH_DELAY_MS);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                log.warn("Batch delay interrupted", ie);
+                log.warn("Interrupted during delay after processing article {}", dto.getId(), e);
             }
         }
+
+
+        log.info("Finished processing all articles.");
     }
 
     private void processAndSave(NewsArticleDto dto) {
@@ -76,7 +44,7 @@ public class DataLoader {
             NewsArticle article = buildArticle(dto);
             article.setLlmSummary(llmService.summarize(dto.getDescription()));
             newsRepository.save(article);
-            log.info("Saved article {}", dto.getId());
+            log.info("Saved article::::::: {}", dto.getId());
         } catch (Exception ex) {
             log.error("Failed processing article {}", dto.getId(), ex);
         }

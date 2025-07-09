@@ -23,7 +23,4 @@ public interface NewsRepository extends JpaRepository<NewsArticle, UUID> {
     Page<NewsArticle> searchByTitleOrDescription(String query, Pageable pageable);
 
 
-//    Page<NewsArticle> findByContentContainingIgnoreCaseAndLocationIgnoreCase(String content, String location, Pageable pageable);
-
-
 }
