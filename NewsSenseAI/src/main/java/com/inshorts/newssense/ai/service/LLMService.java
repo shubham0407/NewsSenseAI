@@ -1,6 +1,7 @@
 package com.inshorts.newssense.ai.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,9 @@ public class LLMService {
 
     //    @Value("${openai.api.key}")
     private String apiKey;
+
+    @Value("${baseUrl}")
+    private String baseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String summarize(String content) {
@@ -27,7 +31,7 @@ public class LLMService {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-                ResponseEntity<Map> response = restTemplate.exchange("http://192.168.0.130:11434/api/generate", HttpMethod.POST, requestEntity, Map.class);
+                ResponseEntity<Map> response = restTemplate.exchange(baseUrl+"/api/generate", HttpMethod.POST, requestEntity, Map.class);
                 if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                     Object result = response.getBody().get("response");
                     return result != null ? result.toString().trim() : "[LLM Error: No response field]";

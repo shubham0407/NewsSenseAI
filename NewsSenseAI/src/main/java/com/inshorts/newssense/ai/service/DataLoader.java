@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class DataLoader {
-    private static final long DELAY_MS = 1000;
+    private static final long DELAY_MS = 2000;
     @Autowired
     private NewsRepository newsRepository;
     @Autowired
@@ -23,7 +23,7 @@ public class DataLoader {
     public void loadData(List<NewsArticleDto> dtos) {
         log.info("Starting sequential loading of {} articles...", dtos.size());
 
-        int limit = Math.min(100, dtos.size());
+        int limit = Math.min(10000, dtos.size());
         for (int i = 0; i < limit; i++) {
             NewsArticleDto dto = dtos.get(i);
             processAndSave(dto);
@@ -34,8 +34,6 @@ public class DataLoader {
                 log.warn("Interrupted during delay after processing article {}", dto.getId(), e);
             }
         }
-
-
         log.info("Finished processing all articles.");
     }
 

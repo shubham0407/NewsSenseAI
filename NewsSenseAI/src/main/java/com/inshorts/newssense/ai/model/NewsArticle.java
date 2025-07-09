@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "news_articles")
-//@Builder
 public class NewsArticle {
     @Id
     private UUID id;
