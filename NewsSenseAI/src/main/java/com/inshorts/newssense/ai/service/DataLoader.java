@@ -22,9 +22,8 @@ public class DataLoader {
 
     public void loadData(List<NewsArticleDto> dtos) {
         log.info("Starting sequential loading of {} articles...", dtos.size());
-
         int limit = Math.min(10000, dtos.size());
-        for (int i = 0; i < limit; i++) {
+        for (int i=0; i < limit; i++) {
             NewsArticleDto dto = dtos.get(i);
             processAndSave(dto);
             try {
